@@ -375,3 +375,394 @@ The Kinesis Family
   * Know the difference in the KPL, KCL, and Kinesis API
   * For a given scenario, know which streaming Kinesis service to use.
 
+# Data Preparation
+
+## Data Preparation Concepts
+
+Data Preparation 
+  * The process of transforming a dataset using different techniques to prepare it for model training and testing
+  * Changing our dataset so it is ready for machine learning
+
+Categorical Encoding - Converting categorical values into numeric values using mapping and one-hot techniques
+
+Feature Engineering - Transforming features so they are ready for ML algorithms. Ensures the relevant features are used for the problem at hand.
+
+Handling Missing Values - Removing incomplete, incorrect formatted, irrelevant or duplicated data
+
+Options for Data Preparation 
+  * SageMaker & Jupyter Notebooks
+  * ETL jobs in AWS Glue
+
+## Categorical Encoding
+
+Categorical Encoding
+  * The process of manipulating categorical variables when ML algorithms expect numerical values as inputs
+  * Changing category values in our dataset to numbers
+
+categorical variable = categorical feature = discrete feature
+
+### When to encode? 
+
+| Problem | Algorithm | Encoding |
+| --- | --- | --- |
+| Predicting the price of a home | Linear Regression | Encoding necessary |
+| Determine whether given text is about sports or not | Naive Bayes | Encoding not necessary |
+| Detecting malignancy in radiology images | Convolutional Neural Network | Encoding necessary | 
+
+Categorical Encoding Examples:
+  * Color: {green, purple, blue}, multicategorical
+  * Evil: {true, false}, binary categorical
+  * Size: {L > M > S}, ordinal
+
+Nominal - order does not matter
+Ordinal - order does matter
+
+Binary Categorical - can map to 0 & 1
+
+Multicategorical Ordinal - can map to integers (e.g. S to 1, M to 5, L to 10)
+
+Multicategorical Nominal - shouldn't map to integers, implies order that's not there
+
+One-hot Encoding
+  * Transforms nominal categorical features and creates new binary columns for each observation
+  * Adding columns to your dataset of 1's and 0's
+  * One-hot encoding is not always a good choice when there are many, many categories
+  * Using techniques like grouping by similarity could create fewer overall categories before encoding
+  * Mapping rare values to "other" can help reduce overall number of new columns created
+
+Categorical Encoding Summary
+  1. In general, categorical encoding is used when the ML algorithm cannot support categorical data
+  2. We must find a way to turn text attributes into numeric attributes within our datasets.
+  3. There is no "golden rule" on how to encode your categories (or transform your data in general)
+  4. There are many different approaches and each approach can have a different impact on the outcome of your analysis
+
+## Text Feature Engineering
+
+Feature Engineering - Transforming attributes within our data to make them more useful within our model for the problem at hand. Feature engineering is often compared to an art
+
+Text Feature Engineering 
+  * Transforming text within our data so Machine Learning algorithms can better analyze it
+  * Splitting text into bite size pieces
+
+Example: 
+
+> Raw Text: {"123 Main Street, Seattle, WA 98101"}
+
+With basic processing, can get something more useful: 
+
+|Address|City|State|Zip|
+|---|---|---|---|
+|123 Main Street|Seattle|WA|98101|
+
+### Bag-of-Words
+
+Tokenizes raw text and creates a statitical representation of the text
+
+Breaks up text by white space into single words
+
+Example: 
+
+> Raw Text: {"he is a jedi and he will save us"} -> Bag-of-Words -> {"he", "is", "a", "jedi", "and", "he", "will", "save", "us"}
+
+Becomes:
+
+|Id|word|count|
+|---|---|---|
+|1|he|2|
+|2|is|1|
+|3|a|1|
+|4|jedi|1|
+|5|and|1|
+|6|will|1|
+|7|save|1|
+|8|us|1|
+
+### N-Gram
+
+An extension of Bag-of-Words which produces groups of words of *n* size
+
+Breaks up text by white space into groups of words
+
+Example:
+
+> Raw Text: {"he is a jedi and he will save us"} -> N-gram, size = 1 -> {"he", "is", "a", "jedi", "and", "he", "will", "save", "us"}
+
+Same as Bag-of-Words
+
+> Raw Text: {"he is a jedi and he will save us"} -> N-gram, size = 2 -> {"he is", "is a", "a jedi", "jedi and", "and he", "he will", "will save", "save us", "he", "is", "a", "jedi", "and", "he", "will", "save", "us"}
+
+
+Uses a sliding window of size 2, once it finds all the pairs, also produces any n's less than its size.
+
+unigram = 1 word tokens
+
+bigram = 2 word tokens
+
+trigram = 3 word tokens
+
+...
+
+### Orthogonal Sparse Bigram (OSB)
+
+Creates groups of words of size *n* and outputs every pair of words that includes the first word
+
+Creates groups of words that always include the first word
+
+Meaning:
+  * Orthogonal - when two things are independent of each other
+  * Sparse - Scattered or thinly distributed
+  * Bigram - 2-gram or two words
+
+OSB is not "better" or "worse" than N-Gram, it's just another technique to use...
+
+Example:
+
+```
+Raw Text: {"he is a jedi and he will save us"} -> OSB, size = 4 -> 
+  {"he_is", "he__a", "he___jedi"}
+  {"is_a", "is__jedi", "is___and"}
+  {"a_jedi", "a__and", "a___he"}
+  {"jedi_and", "jedi__he", "jedi___will"}
+  {"and_he", "and__will", "and___save"}
+  {"he_will", "he__save", "he___us"}
+  {"will_save", "will__us"}
+```
+
+Always keeps the first word, then uses underscores where the other words in the token are
+
+### Term Frequency - Inverse Document Frequency (tf-idf)
+
+Represents how important a word or words are to a given set of text by providing appropriate weights to terms that are common and less common in the text
+
+Shows us the popularity of a word or words in text data by making common words like "the" or "and" less important
+
+Meaning:
+  * Term Frequency - How frequent does a word appear
+  * Document Frequency - Number of documents in which terms occur
+  * Inverse - Makes common words less meaningful
+
+Example:
+
+Document 1:
+
+|word|count|
+|---|---|
+|the|3|
+|force|1|
+|Luke|1|
+|Skywalker|1|
+|a|2|
+
+Document 2:
+
+|word|count|
+|---|---|
+|the|2|
+|jedi|1|
+|a|1|
+|empire|1|
+
+Since the tokens "the" and "a" showed up in BOTH documents many times, these are deemed as less important
+
+Vectorized tf-idf: (number of documents, number of unique n-grams)
+
+Example: (2,7)
+
+2 - number of documents
+
+7 - number of unique n-grams
+
+### Use Cases
+
+|Problem|Transformation|Why|
+|---|---|---|
+|Matching phrases in spam emails|N-Gram|Easier to compare whole phrases like "click here now" or "you're a winner"|
+|Determining the subject matter of multiple PDFs|Tf-idf & Orthogonal Spare Bigram | Filter less important words in PDFs. Then find common word combinations repeated throughout PDFs.|
+
+### Simple Transformations
+
+Remove Punctuation
+  * Sometimes removing punctuation is a good idea if we do not need them.
+
+Example:
+
+> Raw Text: {"Help me, Obi-Wan Kenobi. You're my only hope."} -> remove punctuation -> {"Help", "me" "Obi-Wan", "Kenobi", "You're", "my", "only", "hope"}
+
+Lowercase Transformation
+  * Using lowercase transformation can help standardize raw text
+
+Example:
+
+> Raw Text: {"I Find Your Lack of Faith Disturbing"} -> lowercase -> {"i find your lack of faith disturbing"} 
+
+### Cartesian Product Transformation
+
+Creates a new feature from the combination of two or more text or categorical values
+
+Combining sets of words together
+
+Meaning:
+  * Cartesian - Rene Descartes, created Cartesian Coordinate System
+  * Product - multiplication
+
+__We are multiplying a set of words by another set of words to create a new feature__
+
+Example:
+
+|ID|textbook|binding|
+|---|---|---|
+|1|Python Data Science Handbook|Softcover|
+|2|Visualization Analysis & Design|Hardcover|
+|3|Machine Learning Algorithms|Softcover|
+
+Remove punctuation -> cartesian product (textbook, binding)
+
+Returns:
+
+|Id|cartesian_product|
+|---|---|
+|1|{"Python_Softcover", "Data_Softcover", "Science_Softcover", "Handbook_Softcover"}|
+|2|{"Visualization_Hardcover", "Analysis_Hardcover", "Design_Hardcover"}|
+|3|{"Machine_Softcover", "Learning_Softcover", "Algorithms_Softcover"|
+
+### Feature Engineering Dates
+
+Date Formats:
+  * 2013-02-08T09
+  * 6 Mar 17 21:22 UT
+  * Mon 06 Mar 2017 21:22:23 z
+  * 09/28/2019
+
+Extracted Information:
+  * Was it a weekend? Was it a week day?
+  * Was the date the end of a quarter?
+  * What was the season?
+  * Was the day a holiday?
+  * Was it during business hours?
+  * Was the World Cup taking place on this date?
+
+Example:
+
+|Date|
+|---|
+|2015-06-17|
+|2015-04-24|
+|2015-02-12|
+|2015-12-16|
+|2015-03-14|
+
+date feature engineering ->
+
+|is_weekend|day_of_week|month|year|
+|---|---|---|---|
+|0|2|6|2015|
+|0|4|4|2015|
+|0|3|2|2015|
+|0|2|12|2015|
+|1|5|3|2015|
+
+### Text Feature Engineering Summary
+
+|Technique|Function|
+|---|---|
+|N-Gram|Splits text by whitespace with window size *n*|
+|Orthogonal Sparse Bigram (OSB)|Splits text by keeping first word and uses delimiter with remaining whitespaces between second word with window size *n*|
+|Term Frequency - Inverse Document Frequency (tf-idf)|Helps us determine how important words are within multiple documents|
+|Removing Punctuation|Removes punctuation from text|
+|Lowercase|Lowercase all the words in the text|
+|Cartesian Product|Combines words together to create new feature|
+|Feature Engineering Dates|Extracts information from dates and creates new features|
+
+## Numeric Feature Engineering
+
+Transforming numeric values within our data so Machine Learning algorithms can better analyze hem
+
+Changing numeric values in our datasets so they are easier to work with
+
+Common Techniques:
+  * Feature Scaling
+    * Changes numeric values so all values are on the same scale.
+      * Normalization
+      * Standardization
+  * Binning
+    * Changes numeric values into groups or buckets of similar values
+      * Quantile Binning aims to assign the same number of features to each bin
+
+
+### Feature Scaling 
+
+scaling = feature scaling = normalization
+
+Normalization scales numbers between 0 and 1
+
+__Outliers can throw off normalization!__
+
+Standardization - uses z-scores to smooth out values
+
+Scaling Summary:
+  * Scaling features is required for many algorithms like linear/non-linear regression, clustering, neural networks, and more. Scaling features depends on the algorithm you use
+  * Normalization rescales values from 0 to 1 but doesn't handle outliers very well
+  * Standardization rescales values by making the values of each feature in the data have zero mean and is much less affected by outliers
+  * When you're done, you can always scale back the data to the original representation
+
+### Binning
+
+Categorizes numerical data into more useful groups, e.g. ages into "30s and below", "30s-50s", and "50 and above"
+
+__We can end up with irregular bins which are not uniform__
+
+Can apply Quantile Binning to fix
+
+Meaning:
+  * Quantile - equal parts
+  * Binning - grouping
+
+Grouping things together in equal parts.
+
+From there, apply categorical data to each bin and use other techniques to find correlation between our predicted value and our target attribute
+
+|age|
+|---|
+|24|
+|45|
+|18|
+|32|
+|40|
+|76|
+
+Quantile Binning -> 
+
+|age_bin|
+|---|
+|Youth|
+|Young Adult|
+|Youth|
+|Young Adult|
+|Adult|
+|Adult|
+
+one-hot encoding -> 
+
+|Youth|Young Adult|Adult|
+|---|---|---|
+|1|0|0|
+|0|1|0|
+|1|0|0|
+|0|1|0|
+|0|0|1|
+|0|0|1|
+
+Quantile Binning Summary:
+  * Binning is used to group together values to reduce the effects of minor observation errors
+  * Quantile binning bins values into equal numbers of bins
+  * Optimum number of bins depends on the characteristics of the variables and its relationship to the target. This is best determined through experimentation
+
+### Numeric Feature Engineering Summary
+
+|Technique|Function|
+|---|---|
+|Normalization|From 0 to 1. 0 - minimum value, 1 - maximum value.|
+|Standardization|0 is the average. Value is the z-score.|
+|Quantile Binning|Creates equal number of bins.|
+
+## Other Feature Engineering
