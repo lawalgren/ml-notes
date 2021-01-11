@@ -766,3 +766,290 @@ Quantile Binning Summary:
 |Quantile Binning|Creates equal number of bins.|
 
 ## Other Feature Engineering
+
+Image Feature Engineering
+  * Extracting useful information from images before using them with ML algorithms.
+  * Transforming images to find out useful information
+
+Audio Feature Engineering
+  * Extracting useful information from sounds and audio before using them with ML algorithms
+  * Transforming audio data into something useful
+  
+Dataset Formats: 
+  * File
+    * Loads all of the data from S3 directly onto the training instance volumes
+    * CSV
+    * JSON
+    * Parquet
+    * Image files (.png or .jpg)
+  * Pipe
+    * Your datasets are streamed directly from Amazon S3
+    * recordIO-protobuf (creates tensor)
+
+Feature Engineering is like a layered cake. Usually there are __multiple__ layers of transformations done to properly __prepare__ your __data__.
+
+## Handling Missing Values
+
+Missing data can be represented in many different ways (*null, NaN, NA, None, etc.*) and handling missing values is an important data preparation step.
+
+Why are values missing in the first place?
+  * Missing at Random (MAR) 
+    * Missing at random means that the propensity for a data point to be missing is not related to the missing data, but it is related to some of the observed data
+  * Missing Completely at Random (MCAR)
+    * The fact that a certain value is missing has nothing to do with its hypothetical value and with the values of other variables
+  * Missing not at Random (MNAR)
+    * Two possible reasons are that the missing value depends on the hypothetical value or missing values is dependent on some other variable's value
+
+How to handle missing values:
+
+|Technique|Why this works|Ease of Use|
+|---|---|---|
+|Supervised learning|Predicts missing values based on the values of other values|Most difficult, can yield best results|
+|Mean|The average value|Quick and easy, results can vary|
+|Median|Orders values then chooses value in the middle|Quick and easy, results can vary|
+|Mode|Most common value|Quick and easy, results can vary|
+|Dropping rows|Removes missing values|Easiest but can dramatically change datasets|
+
+Replacing data is known as __imputation__
+
+## Feature Selection
+
+Feature Selection
+  * Selecting the most relevant features from your data to prevent over-complicating the analysis, resolving potential inaccuracies, and removes irrelevant features or repeated information
+  * Deciding what to keep and what to get rid of
+
+Feature selection is an __intuitive step__ humans take to reduce the number of features. 
+
+Principle Component Analysis (PCA)
+  * An unsupervised learning algorithm that reduces the number of features while still retaining as much information as possible
+  * Reduces the total number of features in a dataset
+
+Feature Selection Use Cases:
+
+|Problem|Technique|Why|
+|---|---|---|
+|Data is too large due to the large number of features|Principle Component Analysis (PCA)|Algorithm that reduces total number of features|
+|Useless features that do not help solve ML problem|Feature Selection|Remove features that do not help solve the problem|
+
+## Helper Tools
+
+AWS Glue
+  * Setup a crawler that crawls your input datasource (*S3, DynamoDB, RDS, Redshift, Database on EC2*), determines the schema/structure of your dataset
+  * Crawler creates a Data Catalog, the metadata, datatypes, important data about dataset
+  * Then set up jobs in Scala or Python to transform the dataset
+  * Then output transformed data into data source (*Athena, EMR, S3, Redshift*) and use later for the ML process
+  * Job Types
+    * Spark - default type, fully managed cluster of Apache Spark servers that Glue runs in the background and allows us to run transformation code on
+      * ETL language - PySpark or scala, used to tranform data
+      * How we want the code to be generated
+        * AWS generate the script for us
+        * Provide with a script of our own
+        * Start a brand new script from scratch
+    * Python shell
+      * Traditional python scripts to run on your datasets
+  * Also allows you to use Zeppelin / Jupyter notebooks to do ad-hoc/simple transformations
+
+SageMaker
+  * Allows you to create Jupyter notebooks that are directly integrated with the SageMaker service
+
+Elastic Map Reduce (EMR)
+  * Entire data preparation ETL could be done on the EMR ecosystem.
+  * A fully managed hadoor cluster that runs on multiple EC2 instances
+  * Can pick and choose different frameworks that you want to use within the cluster
+  * Great at scaling petabytes worth of data over distributed systems
+  * Notable Tools
+    * Apache Spark - ETL and Machine Learning Library
+    * Presto - SQL Query Engine
+    * Mahout - Machine Learning Framework
+    * Hive - ETL Service
+    * Jupyter Notebooks - Code Sharing
+    * TensorFlow - Machine Learning Framework
+    * Hadoop Distributed File System (HDFS) - Persistant Datastore
+    * MXNet - Machine Learning Framework
+  * Given data stored in our EMR cluster, how do we use it within SageMaker?
+    * Can use Apache Spark to integrate directly within SageMaker
+  * How do we perform the least amount of effort for ETL jobs?
+    * Using AWS Glue, because it's fully managed and we don't have to manage the cluster ourselves in EMR
+
+Athena
+  * Run SQL Queries on S3 data
+  * Managed by AWS, as long as you have data catalog set up, you can query it with Athena
+
+Data Pipeline
+  * Process and move data between different AWS Compute services
+  * Moving data from DynamoDB, RDS, Redshift, through Data Pipeline, doing ETL jobs with EC2 instances/EMR, landing output dataset in target data source (*Athena, EMR, S3, Redshift*)
+  * Can choose from list of built in templates to migrate from one service to another
+
+Which service to use?
+
+|Datasource|Data Preparation Tool|Why|
+|---|---|---|
+|S3, Redshift, RDS, DynamoDB, On Premise DB|AWS Glue|Use Python or Scala to transform data and output data into S3|
+|S3|Athena|Query data and output results into S3|
+|EMR|PySpark/Hive in EMR|Transform petabytes of distributed data and output data into S3|
+|RDS, EMR, DynamoDB, Redshift|Data Pipeline|Setup EC2 instances to transform data and output data into S3, if you wanted to use some language other than Python or Scala|
+
+## Exam Tips
+
+Data Preparation
+  * Know what data preparation is and why it is important in Machine Learning
+  * Understand the different techniques used for preparing data
+
+Categorical Encoding
+  * Know why categorical encoding is used for certain ML algorithms
+  * Understand the difference between ordinal and nominal categorical features
+  * Understand that categorical data is qualitative and continuous data is quantitative
+  * Know what one-hot encoding is and where to use it
+
+Numeric Feature Engineering
+  * Know what numeric feature engineering is and why it is important
+  * Know different techniques used for feature engineering numeric data
+  * Know the different types of feature scalin and when they should be used
+    * Normalization
+    * Standardization
+  * Know what binning is and when it should be used
+
+Text Feature Engineering
+  * Know what text feature engineering is and why it is important
+  * Know different techniques used for feature engineering text data
+    * N-Gram
+    * Orthogonal Sparse Bigram (OSB)
+    * Term Frequency-Inverse Document Frequency (tf-idf)
+    * Removing punctuation
+    * Lowercase transformation
+    * Cartesian product
+  * Understanding why feature engineering dates is important
+  * Know the questions we can answer when dates are transformed
+
+Other Feature Engineering
+  * Know other types of feature engineering covered
+
+Handling Missing Values
+  * Know why handling missing values is an important step in data preparation
+  * Know the different techniques used for handling missing values
+  * Understand implications of dropping rows
+  * Understand what data imputation is
+
+Feature Selection
+  * Know what feature selection is and why it is important
+  * Understand the difference in feature selection and Principle Component Analysis (PCA)
+
+Data Preparation Tools
+  * Know the different AWS services that allow you to transform data
+  * Know what a Data Catalog, Crawlers, and Jobs are in AWS Glue
+  * Be able to identify the different AWS servics and when to use one transformation over another
+
+# Data Analysis and Visualization
+
+## Data Analysis and Visualization Concepts
+
+Seeing your data
+  * Relationships
+    * Do we want to find important relationships within our data? Are there any trends or outliers?
+  * Comparisons
+    * Are we comparing different values within our data?
+  * Distributions
+    * Do we want to know more about the distributions of our data? Are there any outliers?
+  * Compositions
+    * Do we want to know what makes up our data? What are the different parts of our data as a whole?
+  * Ways to see your data
+    * Developer Tools (matplotlib, R)
+    * Business Intelligence Tools (BI Tools) (Tableau, Amazon QuickSight)
+
+Amazon QuickSight
+  * Business intelligence tool (BI tool) that makes it easy to create visualizations from your data
+  * Create awesome visualizations in the AWS console
+
+## Relationships
+
+Visualizing relationships in your data can provide a good general overview, show distribution, and correlation between attributes. Visualizing relationships can also help find outliers and extreme values.
+
+Scatter Plots - Also known as scatter charts. These graphs plot points along the x and y axis for two values.
+
+Bubble Plots - Also known as bubble charts. These graphs plot points along the x and y axis for three values. Bubble size is the third value measured.
+
+Use Cases
+  * Scatter Plots
+    * Example: Is there any relationship between the size of a home and the price?
+  * Bubble Plots
+    * Example: Are there any relationships between the size of a home, the age of the home, and the price?
+
+## Comparisons
+
+Visualizing comparisons in your data can provide a static snapshot of how different variables compare and show how different variables change over time.
+
+Bar Charts - graphs that use line (bars) to mark single variable values. Provides a way to lookup and compare values
+
+Line Charts - graphs that use lines to show one or more variables changing over time
+
+Use Cases
+  * Bar Charts
+    * Example: Comparing the number of star ratings for a mobile application in the app store
+  * Line Charts
+    * Example: Plotting the price of Bitcoin over the past 3 years
+
+## Distributions
+
+Visualizing distributions in your data can show how your data is grouped or clustered over certain intervals.o
+
+Histograms - put values into buckets or bins and determine a measurement (amount, frequency, duration, density, etc.)
+
+Box Plots - show a wealth of distribution information. You can see things like lowest and highest values, outliers, and where most of the values fall
+
+Scatter Plots - Also known as scatter charts. These graphs plot points along the x and y axis for two values. Can show clustering and distribution of your data
+
+Use Cases
+  * Histograms & Box Plots
+    * Example: Showing the distribution of test scores for a given exam
+  * Scatter Charts
+    * Example: Showing the return of investment (ROI) for the amount of money spent and the total time invested
+
+## Compositions
+
+Visualizing composition of your data show the various elements and what your data is made of
+
+Pie Charts - show how various values compare as a whole, share of the total
+
+Stacked Area Charts - show the measurement of various items over longer periods of time
+
+Stacked Column Charts - Also known as stacked bar charts. These graphs show the quantity of various items over shorter periods of time.
+
+Use Cases
+  * Pie Charts
+    * Showing the sales figures for each region
+  * Stacked Area Charts
+    * Example: Showing the number of products sold by different departments on a weekly basis
+  * Stacked Bar Charts
+    * Example: Showing the quarterly revenue totals for each region
+
+## Choosing a Visualization
+
+Picking the right graph, chart, or visualization just depends on what you want to see
+
+What do we want to show?
+  * Relationship
+    * 2 variables - Scatter Plot
+    * 3 variables - Bubble Chart
+  * Comparison
+    * Value look ups - Bar Charts
+    * Change over time - Line Chart
+  * Distribution
+    * Single distribution - Histogram
+    * Multi distribution - Box Plots / Scatter Plots
+  * Composition
+    * Changing over time - Stacked Bar Chart / Stacked Area Chart
+    * Static - Pie Chart
+
+Heatmaps are graphs that represent values as color. As the values change, the color representation of the data changes too.
+
+## Exam Tips
+
+Data Analysis and Visualization
+  * Know what data analysis and visualization is and why it is important
+  * Understand what Amazon QuickSight is and how it can be used.
+  * Be able to recognize different types of visualizations and what each visualization represents
+    * Relationships
+    * Comparisons
+    * Distribution
+    * Composition
+  * Know what heatmaps are and what they can represent
