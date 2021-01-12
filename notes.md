@@ -1053,3 +1053,248 @@ Data Analysis and Visualization
     * Distribution
     * Composition
   * Know what heatmaps are and what they can represent
+
+# Modeling
+
+## Modeling Concepts
+
+What is a model? 
+  * Taking a problem or challenge as described by lots of data, adding a machine learning algorithm and through computation, trying to figure out a mathematical formula that can accurately generalize about that problem.
+
+Questions to ask for developing a good model
+  * What type of generalization are we seeking?
+    * Do I need to forecast a number? Decide whether a customer is more likely to choose Option A or Option B? Detect a quality defect in a machined part?
+  * Do we really need machine learning?
+    * Can simple heuristics handle the job just as well? Can I just program some IF...THEN logic? Will a linear regression formula or a look-up function fulfill the needs?
+  * How will my ML generalizations be consumed?
+    * Do I need to return real-time results or can I process the inferences in batch? Will consumers be applications via API call or some other systems which will perform additional processing on the data?
+  * What do we have to work with?
+    * What sort of data accurately and fully captures the inputs and outputs of the target generalization? Do I have enough data? Do I have too much?
+  * How can I tell if the generalization is working?
+    * What method can I use to test accuracy and effectiveness? Should my model have a higher sensitivity to false positives or false negatives? How about Accuracy, Recall, and Precision?
+
+||Supervised Learning|Unsupervised Learning|Reinforcement Learning|
+|---|---|---|---|
+|Discrete|Classification|Clustering|Simulation-based Optimization|
+|Continuous|Regression|Reduction of Dimentionality|Autonomous Devices|
+
+Choosing the Right Approach:
+
+|Problem|Approach|Why|
+|---|---|---|
+|Detect whether a financial transaction is fraud|Binary Classification|Only two possible outcomes: Fraud or Not Fraud|
+|Predict the rate of deceleration when brakes are applied|Heuristic Approach (No ML Needed!)|Well-known formulas involving speed, inertia and friction to predict this|
+|Determine the most efficient path of surface travel for a robotic lunar rover|Simulation-based Reinforcement Learning|Must figure out the optimal path through trial, error and improvement|
+|Determine the breed of dog in a photograph|Multi-Class Classification|Which dog breed is most associated with the picture among many breeds?|
+
+Sometimes you have to combine algorithms to solve the problem
+
+Example: What is the estimated basket size of shoppers who respond to our email promotion?
+
+Steps:
+  * Remove outliers (Random Cut Forest) ->
+    * Identify relevant attributes (PCA) ->
+      * Cluster into groups (K-Means) ->
+        * Predict basket size (Linear Learner)
+
+Confusion Matrix:
+
+Columns are actual outcome
+
+Rows are predicted outcome
+
+||TRUE|FALSE|
+|---|---|---|
+|TRUE|I predicted correctly!|I was wrong. (False Positive)|
+|FALSE|I was wrong. (False Negative)|I predicted correctly!|
+
+Problem: Is a given financial transaction fraudulent?
+
+||Fraud|Not Fraud|
+|---|---|---|
+|Fraud|Happy Bank. Happy Customer. (No Money Loss)|Happy Bank. Angry Customer. (No Money Loss)|
+|Not Fraud|Angry Bank. Angry Customer. (Money Lost!)|Happy Bank. Happy Customer. (No Money Loss)|
+
+Evaluation Approach
+  * The Bank is likely ok with more false positives than false negatives as it further reduces their exposure to fraud. 
+  * We'd closely look at Recall
+
+Problem: Is this email spam?
+||Spam|Not Spam|
+|---|---|---|
+|Spam|Spam is blocked.|Legitimate emails are blocked.|
+|Not Spam|Spam gets through.|Legitimate emails get through.|
+
+Evaluation Approach:
+  * It's better to let spam through than to block legitimate emails.
+  * Set the evaluation approach to be more error on the side of caution to let spam through
+  * We'd watch the Precision of the model closely
+
+## Data Preparation
+
+We want __Generalization__ not __Memorization__
+
+Use most data to train, but reserve some data to see if the model has really learned to generalize and not just repeating what we've already shown it.
+
+Normally we break off 20-30% of the data as testing data, train the model on the remaining training data, and evaluate using the testing data.
+
+Testing data should be similar in makeup to the training data, otherwise we could have a high error rate.
+
+Instead we want to:
+  * Randomize the training data
+  * Then Split into training set and test set
+  * Then train the model on the training data
+  * Then evaluate the model using the test data
+
+That doesn't work for every dataset though. For timeseries data, we would be better served by a Sequential Split strategy, using the beginning of the data to train, and the end to test.
+
+Beware of situations where the model and evaluation set are too dissimilar by way of descriptive statistics to be useful. This can happen when data is sorted by one of the columns in the dataset then split sequentially.
+
+We can evaluate a dataset for this problem using K-Fold Cross-Validation: using K different training/test set splits and evaluating the error rate of each respectively.
+  * If the error rates of each different round (fold) is approximately equal to each other, the data was well randomized.
+  * If one of the rounds has a significantly higher error rate, maybe our data isn't as random as we thought it was.
+
+## SageMaker Modeling
+
+SageMaker has 4 basic areas:
+  * Ground Truth - Set up and manage labeling jobs for training datasets using active learning and human labeling
+  * Notebook - Access a managed Jupyter Notebook environment
+  * Training - Train and tune models
+  * Inference - Package and deploy your machine learning models at scale
+
+Options for Model Creation:
+  * SageMaker Console
+  * Jupyter Notebooks
+  * SageMaker SDK
+  * Apache Spark
+
+Modeling Process
+
+* Training Dataset and Test Dataset go into S3
+* Model reads from S3
+
+Several data formats are supported:
+  * Check the documentation for the respective algorithm for recommendations
+
+|ContentType|Recommended SplitType|
+|---|---|
+|application/x-recordio-protobuf|RecordIO|
+|text/csv|Line|
+|application/jsonlines|Line|
+|application/json|None|
+|application/x-image|None|
+|image/*|None|
+
+|Accept|Recommended AssembleWith|
+|---|---|
+|application/x-recordio-protobuf|None|
+|application/json|None|
+|application/jsonlines|Line|
+
+Most SageMaker algorithms accept CSV
+  * The Target Value should be in the first column with no header. Be sure the metadata Content-Type is "text/csv" in S3
+
+For Unsupervised algorithms we specify the absence of labels
+  * The Target Value should be in the first column with no header. Notice we specify the label size in the metadata value.
+
+For optimal performance, the optimized protobuf recordIO format is recommended.
+  * Using this format, we can take advantage of Pipe mode
+  * The advantage of recordIO and Pipe mode is that the data can be streamed from S3 to the learning instance requiring less EBS space and faster start-up.
+
+CreateTrainingJob API
+  * Two Options
+    * High-Level Python library provided by Amazon SageMaker
+    * Use the SDK for Python 
+  * Doing the same things
+    * Specify the training algorithm
+    * Supply algorithm-specific hyperparameters
+    * Specify the input and output configuration
+
+Difference between parameter and hyperparameter
+  * Hyperparameters - Values set __before__ the learning process
+  * Parameters - Values __derived via__ the learning process
+
+## SageMaker Training
+
+When you call the SageMaker library, in the background, SageMaker uses an Elastic Container Repository, which has Training Images and Inference Images for the various ML Algorithms.
+
+Training is very math intensive, but inference typically isn't, so the training images tend to be much higher powered.
+
+CreateTrainingJob API Call - References the Training Images
+
+CreateModel API Call - References the Inference Images
+
+### Training
+
+These image repositories are in different regions, select one near you.
+
+|Algorithm Name|Channel Name|Training Image and Inference Image Registry Path|Training Input Mode|File Type|Instance Class|
+|---|---|---|---|---|---|
+|BlazingText|train|`<ecr_path>`/blazingtext:`<tag`>|File or Pipe|Text file (one sentence per line with space-separated tokens)| GPU (single instance only) or CPU|
+|DeepAR Forecasting|traing and (optionally) test)|`<ecr_path>`/forecasting-deepar:`<tag`>|File|JSON Lines or Parquet|GPU or CPU|
+...
+
+Training Image Selection:
+  * Training Images are named differently for which algorithm you want to use.
+  * Also have a channel name to keep straight whether you're training, testing validating, etc.
+  * Training Image and Inference Image Registry Path differ from algorithm to algorithm. If using the SageMager Python Library, it will automatically know most paths.
+  * Note the Tag attribute. It is a form of versioning for the repository.
+    * Use __:1__ version flag to ensure the stable version
+    * Use __:latest__ version tag for up-to-date but potentially not backward compatible
+    * Use __:1__ for production purposes
+  * Training Input File Mode = type of input data accepted. Recall that Pipe has better performance.
+  * File Type = Format of data accepted by algorithm. Recall the recordIO protobuf has best performance
+  * Instance Class = type of instance required for algorithm
+    * Note that some are GPU only or CPU only
+    * Example: XGBoost implements an open source algorithm optimized for CPUs
+
+Once we've selected our image, SageMaker will spin up our image in Elastic Container Service, access the data from S3, and output results to S3
+
+You can also specify your own Dockerfile, which points to your own repository, and train the model with the CreateTrainingJob API call with ECR path to your image
+  * `nvidia-docker` is supported as well for GPU-optimized images.
+
+When you want to deploy your model:
+  * Pulls inference images from Elastic Container Repository
+  * Hosts your model in Elastic Container Service
+  * Uses S3 as the source of data
+  * We could control access to that model using API Gateway for example
+
+In the training process, there is a log of information logged that could be useful:
+  * Arguments provided
+  * Errors during training
+  * Algorithm accuracy statistics
+  * Timing of the algorithm
+  * Can view in CloudWatch or SageMaker console
+  * Common Errors:
+    * Error in specifying a hyperparameter such as an extra one.
+    * Invalid value for a hyperparameter
+    * Incorrect protobuf file format
+
+Training with Apache Spark:
+  * Can use the SageMaker Spark library to convert Spark DataFrames into protobuf, then send it out to S3, then access from the container as usual
+  * Useful if you already have a large investment in Spark and want to use that data in a training job/inferences
+
+## Exam Tips
+
+Model Design
+  * Selecting a model that is a good fit for the objective
+  * Choosing the proper ML approach for your objective (regression, binary classification, etc.)
+  * Choose proper evaluation strategies for your model
+  * Steps for training a model
+
+Data Preparation
+  * Understand concepts of Training Data and Testing Data
+  * Identify potential biases introduced in an insufficient split strategy
+  * Know when to use sequential splits vs randomized splits and what additional measures could be used to increase training data value
+
+Model Training
+  * Multiple options for training
+    * SageMaker Console
+    * Apache Spark
+    * Custom Code via SDK
+    * Jupyter Notebook
+  * Be familiar with the default data types SageMaker algorithms support and the recommended format for best performance
+  * Know the difference between a Hyperparameter and a Parameter
+  * Understand the repository and container image concept for SageMaker training
+  * Understand the process if you wish to provide your own algorithm
+  * Understand the process for using Apache Spark to interact with SageMaker
