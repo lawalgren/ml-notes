@@ -1298,3 +1298,503 @@ Model Training
   * Understand the repository and container image concept for SageMaker training
   * Understand the process if you wish to provide your own algorithm
   * Understand the process for using Apache Spark to interact with SageMaker
+
+# Algorithms
+
+## Algorithms Concepts
+
+Algorithm - Unambiguous specification of how to solve a class of problems
+
+Algorithm vs Heuristic:
+
+Algorithm - Set of steps to follow to solve a specific problem intended to be repeatable with the same outcome
+
+Heuristic - A mental short-cut or "rule of thumb" that provides guidance on doing a task but does not guarantee a consistent outcome
+
+||Supervised Learning|Unsupervised Learning|Reinforcement Learning|
+|---|---|---|---|
+|Training|Training Data and Testing Data|No Training|How to Maximize Reward|
+|Discrete|Classification|Clustering|Simulation-based Optimization|
+|Continuous|Regression|Reduction of Dimentionality|Autonomous Devices|
+
+Supervised Learning - A teacher or parent __supervises__ the learning process by providing model examples and feedback on quizzes
+
+Unsupervised Learning - You are totally __unsupervised__ and must rely on alternative methods to learn other than prior experience.
+
+Reinforcement Learning - A model seeks to maximize reward, often through trial and error. We want to __reinforce__ the desired behavior.
+
+How to access ML algorithms in AWS
+  * Use SageMaker built-in algorithms
+  * Purchase from AWS Marketplace
+  * Build your own via Docker image
+
+## Regression
+
+### Linear Learner Algorithm
+
+Linear models are supervised learning algorithms for regression, binary classification or multiclass classification problems. You give the model labels (x,y) with x being high-dimensional vector and y is a numeric label. The algorithm learns a linear function, or, for classification problems, a linear threshold function, and maps a vector x to an approximation of label y.
+
+To use this algorithm you need a number or list of numbers which yields some other number... the answer you're after. You can use it to predict a specific value or a threshold for grouping purposes.
+
+Adjusts to minimize error
+  * The algorithm wants the equation to be as good of a fit as possible... meaning the sum of all the distances from the training data point and the line is as low as possible. One method is __Stochastic Gradient Descent__
+  * Stochastic Gradient Descent - trying to minimize error by finding its way down a slope as quickly as possible. May end up in a local minimum, or go all the way to the global minimum
+
+Things to know about Linear Learner
+  * Very Flexible
+    * Can be used to explore different training objectives and choose the best one. Well suited for discrete or continuous inferences
+  * Built-in Tuning 
+    * Has an internal mechanism for tuning hyperparameters separate from the automatic model tuning feature
+  * Good First Choice 
+    * If your data and objective meets the requirements, Linear Learner is a good first choice to try for your model
+
+Use Cases
+  * Predict quantitative value based on given numeric input
+    * Example: Based on last five years ROI from marketing spend, what can we expect to be this year's ROI?
+  * Discrete Binary Classification Problems
+    * Example: Based on past customer response, should I mail this particular customer? Yes or No?
+  * Discrete Multiclass Classification Problems
+    * Example: Based on past customer response, how should I reach this customer? Email, Direct Mail, or Phone Call?
+
+Factorization Machines are better for a sparse dataset (one with missing values)
+
+### Factorization Machines Algorithm
+
+General purpose supervised machine learning algorithm for both binary classification and regression. Captures interaction between features with high dimensional sparse datasets.
+
+To use this algorithm you need a number or list of numbers which yields some other number... the answer you're after. You can use it to predict a specific value or a threshold for placing into one of two groups. It is a good choice when you have "holes" in your data.
+
+Things to know about Factorization Machines Algorithm
+  * Considers only pair-wise features
+    * Amazon SageMaker's implementation of factorization machines will only analyze relationships of two pairs of features at a time
+  * CSV is not supported
+    * CSV is not a choice for sparse dimensions. File and Pipe mode training are supported using recordIO-protobuf format with Float32 tensors
+  * Doesn't work for Multiclass Problems
+    * Factorization Machines algorithm can be run in either binary classification mode or regression mode
+  * Really needs LOTS of data
+    * To make up for the sparseness, needs lots of data. Recommended dimension of the input feature space is between 10,000 and 10,000,000
+  * CPUs rock sparse data better
+    * AWS recommends CPUs with factorization machines for the most efficient experience
+  * Don't perform well on dense data
+    * Other algorithms are much more performant when you have a full set of data
+
+Use Cases
+  * High Dimensional Sparse Data Sets
+    * Example: Click-stream data on which ads on a webpage tend to be clicked given known information about the person viewing the page
+  * Recommendations
+    * Example: What sort of movies should we recommend to a person who has watched and rated some other movies?
+
+## Clustering
+
+What is a Clustering?
+  * Unsupervised algorithms that aim to group things such that they are with other things more similar than different
+
+### K-Means Algorithm
+
+Unsupervised algorithm that attempts to find discrete groupings within data, where members of a group are as similar as possible to one another and as different as possible from members of other groups. The Euclidean distance between these points represents the similarity of the corresponding observations
+
+K-Means will take in a list of things with attributes. You specify which attributes indicate similarity and the algorithm will attempt to group them together such that they are with other similar things. "Similarity" is calculated based on the distance between the identifying algorithms
+
+Things to know about SageMaker K-Means
+  * Expects tabular data
+    * Rows represent the observations that you want to cluster and the columns represent attributes of the observations
+  * Define the Identifying Attributes
+    * You must know enough about the data set to propose attributes that will define similarity. If you have no idea, there are ways around this too!
+  * SageMaker uses a Modified K-Means
+    * AWS uses a modified version of the web-scale K-Means algorithm, which it claims to be more accurate
+  * CPU Instances Recommended
+    * GPU instances can be used but SageMaker's K-Means can only use one GPU
+  * Training is still a thing
+    * You want to be sure your model is still accurate and using the best identifying attributes. Your data just doesn't have labels
+  * You define number of features and clusters
+    * You must define the number of features for the algorithm to analyze and the number of clusters you want
+
+Use Cases
+  * Pulse Code Modulation - sampling audio, converting it to 1's and 0's
+  * Handwriting recognition - clustering similar looking images
+
+## Classification
+
+## K-Nearest Neighbor
+
+Supervised
+
+An index-based, non-parametric method for classification or regression. For classification, the algorithm queries the k points that are closest to the sample point and returns the most frequently used label as the predicted label. For regression, the algorithm queries the k closest points to the sample point and returns the average of the feature values as the predicted value
+
+Predicts the value or classification based on that which you are closest. It can be used to classify or to predict a value (average value of nearest neighbors)
+
+You choose the number of "neighbors"
+  * You include a value for k, or in other words, the number of closest neighbors to use for classifying
+
+KNN is a *lazy* algorithm
+  * Does not use training data points to generalize but rather uses them to figure out who's nearby
+
+The training data stays in memory
+  * KNN doesn't "learn" but rather uses the training dataset to decide on similar samples
+
+Use Cases
+  * Credit Ratings
+    * Example: Group people together for credit risk based on attributes they share with others of known credit usage
+  * Product Recommendations
+    * Example: Based on what someone likes, recommend similar items they might also like
+
+Beware though...KNN is a method of stereotyping and can come with a good degree of bias
+
+Redlining - the practice of literally drawing lines around neighborhoods and classifying those as:
+  A.  Best
+  B.  Still Desirable
+  C.  Definitely Declining
+  D.  Hazardous
+
+Private and public entities would then use those redline maps to deny home loans, insurance, and other services for those less desirable areas -- regardless of the qualifications of the applicant
+
+## Image Analysis
+
+Amazon Rekognition does this for us
+
+Algorithms:
+  * Image Classification - Supervised
+    * Determine the classification of an image. It uses a convolutional neural network (ResNet) that can be trained from scrath or make use of transfer learning.
+    * Think: Hotdog / Not Hotdog
+    * Good resource is ImageNet, a huge database of labeled images
+  * Object Detection - Supervised
+    * Detects specific objects in an image and assigns a classification with a confidence score
+    * Think: There's a clock and a lamp
+  * Semantic Segmentation - Supervised
+    * Low level analysis of individual pixels and identifies shapes within an image
+    * Think: Edge detection
+    * Accepts PNG File Input
+      * You can submit files for training or inference in uncompressed PNG format
+    * Only supports GPU instances for training
+      * Due to the heavy computational power required, GPU instances must be used for training
+    * Can deploy on either CPU or GPU instances
+      * After training is done, model artifacts are output to S3. The model can be deployed as an endpoint with either CPU or GPU instances
+    * Good resource is Cityscapes dataset which captures many elements of cities and classifies many elements of those cities, such as roads, pedestrians, motorcycles, etc.
+
+Use Cases
+  * Image Metadata Extraction
+    * Example: Extract scene metadata from an image provided and store it in a machine-readable format
+  * Computer Vision Systems
+    * Example: Recognize orientation of a part on an assembly line and, if required, issue a command to a robotic arm to re-orient the part.
+
+## Anomaly Detection
+
+### Random Cut Forest
+
+Unsupervised
+
+Detect anomalous data points within a set, like spikes in time series data, breaks in periodicity or unclassifiable points. Useful way to find outliers when it's not feasible to plot graphically. RCF is designed to work with n-dimensional input
+
+Find occurrances in the data that are significantly beyond "normal" (usually more than 3 standard deviations) that could mess up your model training
+
+Gives an Anomaly Score to data points
+  * Low scores indicate that a data point is considered "normal" while high scores indicate the presence of an anomaly
+
+Scales Well
+  * RCF scales very well with respect to number of features, data set size and number of instances
+
+Does not benefit from GPU
+  * AWS recommends using normal compute instance (ml.m4, ml.c5)
+
+Use Cases
+  * Quality Control
+    * Example: Analyze an audio test pattern played by a high-end speaker system for any unusual frequencies
+  * Fraud Detection
+    * Example: If a financial transaction occurs for an unusal amount, unusual time or from an unusual place, flag the transaction for a closer look
+
+### IP Insights
+
+Learns usage patters for IPv4 addresses by capturing associations between IP addresses and various entities such as user IDs or account numbers
+
+Can potentially flag odd online behavior that might require closer review
+
+Ingests Entity/IP address Pairs
+  * Historic data can be used to learn baseline patterns
+
+Returns inferences via a score
+  * When queried, the model will return a score that indicates how anomalous the entity/IP combination is, based on the baseline
+
+Uses a Neural Network
+  * Uses a neural network to learn latent vector representations for entities and IP addresses (learns patterns...)
+
+GPUs recommended for training
+  * Generally, GPUs are recommended but if the dataset is large, distributed CPU instances might be more cost effective
+
+CPUs recommended for inference
+  * Does not require costly GPUs for normal inference activities
+
+Use Cases
+  * Tiered Authentication Models
+    * Example: If a user tries to log into a website from an anomalous IP address, you might dynamically trigger an additional two-factor authentication routine
+  * Fraud Detection
+    * Example: On a banking website, only permit certain activities if the IP address is usual for a given user login
+
+## Text Analysis
+
+### Latent Dirichlet Allocation (LDA)
+
+Latent Dirichlet Allocation (LDA) algorithm is an unsupervised learning algorithm that attempts to describe a set of observations as a mixture of distinct categories. LDA is most commonly used to discover a user-specified number of topics shared by documents within a text corpus. Here each observation is a document, the features are the presence (or occurence count) of each word, and the categories are the topics
+
+Used to figure out how similar documents are based on the frequency of similar words
+
+Use Cases:
+  * Article Recommendation
+    * Example: Recommend articles on similar topics which might have read or rated in the past
+  * Musical Influence Modeling
+    * Example: Explore which musical artists over time were truly innovative and those who were influenced by those innovators
+
+### Neural Topic Model
+
+Unsupervised learning algorithm that is used to organize a corpus of documents into topics that contain word groupings based on their statistical distribution. Topic modeling can be used to classify or summarize documents based on the topics detected or to retrieve information or recommend content based on topic similarities
+
+Similar uses and function to LDA in that both NTM and LDA can perform topic modeling. However, NTM uses a different algorithm which might yield different results than LDA.
+
+### Sequence to Sequence (seq2seq)
+
+Supervised learning algorithm where the input is a sequence of tokens (for example text, adio) and the output generated is another sequence of tokens
+
+Think a language translation engine that can take in some text and predict what that text might be in another language. We must supply training data and vocabulary
+
+Steps consist of embedding, encoding and decoding
+  * Using a neural network model (RNN and CNN), the algorithm uses layers for embedding, encoding and decoding into the target
+
+Commonly initialized with pre-trained word libraries
+  * A standard practice is initializing the embedding layer with a pre-trained word vector like FastText or Glove or to initialize it randomly and learn the parameters during testing
+
+Only GPU instances are supported
+  * Currently Amazon SageMaker seq2seq is only supported on GPU image types and is only set up to train on a single machine. But it does also offer support for multiple GPUs
+
+Use Cases:
+  * Language Translations 
+    * Example: Using a vocabulary, predict the translation of a sentence into another language
+  * Speech to Text
+    * Example: Given an audio "vocabulary", predict the textual representation of spoken words
+
+### BlazingText
+
+Supervised & Unsupervised
+
+Highly optimized iomplementations of the Word2vec and text classification algorithms. The Word2vec algorithm is useful for many downstream natural language processing (NLP) tasks, such as sentiment analysis, machine translation, etc.
+
+Really, really optimized way to determine contextual semantic relationships between words in a body of text
+
+BlazingText Modes
+
+|Modes|Word2Vec (Unsupervised)|Text Classification (Supervised)|
+|---|---|---|
+|Single CPU Instance|Continuous Bag of Words<br>Skip-gram<br>Batch Skip-gram|Supervised|
+|Single GPU Instance<br>(1 or more GPUs)|Continuous Bag of Words<br>Skip-gram|Supervised with 1 GPU|
+|Multiple CPU Instance|Batch Skip-gram|None|
+
+Expects single pre-processed text file
+  * Each line in the file should contain a single sentence. If you need to train on multiple text files, concatenate them in one file and upload the file in the respective channel
+
+Highly Scalable
+  * Improves on traditional Word2Vec algorithm by supporting scale-out for multiple CPU instances. FastText text classifier can leverage GPU acceleration
+
+Around 20x faster than FastText
+  * Supports pre-trained FastText models but also can perform about 20x faster than FastText
+
+Use Cases:
+  * Sentiment Analysis
+    * Example: Evaluate customer comments in social media posts to evaluate whether they have a postitive or negative sentiment (Amazon Comprehend)
+  * Document Classification
+    * Example: Review a large collection of documents and detect whether the document should be classified as containing sensitive data like personal information or trade secrets (Amazon Macie)
+
+### Object2Vec
+
+Supervised
+
+General-purpose neural embedding algorithm that can learn low-dimensional dense embeddings of high-dimensional objects while preserving the semantics of the relationship between the pairs in the original embedding space
+
+A way to map out things in a d-dimensional space to figure out how similar they might be to one another
+
+Word2Vec - feed in words to figure out how closely they are related based on appearances together in different documents
+
+Object2Vec - like word2Vec but doesn't have to be just words, can be products, movies, movie reviews, etc.
+
+Expects pairs of things
+  * Looking for pairs of items and whether they are "positive" or "negative" from a relationship standpoint. Accepts categorical labels or rating/score-based labels
+
+Feature Engineering
+  * Embedding can be used for downstream supervised tasks like classification or regression
+
+Training Data Required
+  * Officially, Object2Vec requires labeled data for training, but there are ways to generate the relationship labels from natural clustering
+
+Use Cases:
+  * Movie Rating Prediction
+    * Example: Predict the rating a person is likely to give a movie based on similarity to other's movie ratings
+  * Document Classification
+    * Example: Determine which genre a book is based on its similarity to known genres (history, thriller, biography, etc.)
+
+## Reinforcement Learning
+
+"The carrot and the stick."
+
+Positive Reinforcement - Provide a positive reward thereby motivating the subject to repeat the behavior, presumably for another positive reward
+
+Negative Reinforcement - Provide a displeasurable experience or response thereby motivating the subject to NOT repeat the undesired behavior
+
+Reinforcement Learning (RL) is a machine learning technique that attempts to learn a strategy, called a policy, that optimizes for an agent acting in an environment. Well suited for solving problems where an agent can make autonomous decisions.
+
+Find the path to the greatest reward
+
+### Markov Decision Process
+
+Agent - the thing that will do the activity
+
+Agent is placed in an Environment (real or simulated)
+
+Reward - the goal of reinforcement learning is to gain the most reward in the fewest number of steps
+
+State - the information about the Environment and maybe any past steps that might be relevant to any future steps
+
+Action - things the Agent can do
+
+Observation - the information available to the Agent at each State
+
+Episodes - iterations from start to finish that the Agent takes while it's accumulating Reward
+
+Policy - lessons the Agent learns when determining the optimal path to make decisions in the future given a similar objective. What we're after. The decision making part of the Reinforcement Learning model that makes choices to maximize our reward
+
+Use Cases:
+  * Autonomous Vehicles
+    * Example: A self-driving car model can "learn" to stay on the road through iterations of trial and error in a simulation. Once the model is good enough, it can be tested in a real vehicle on a test track.
+  * Intelligent HVAC Control
+    * Example: An RL model can learn patterns and routines of building occupants, impact of sunlight as it transitions across the sky and equipment efficiency to optimize the temperature control for lowest energy consumption
+
+## Forecasting
+
+"Past performance is not an indicator of future results."
+
+### DeepAR
+
+Supervised
+
+Forecasting algorithm for scalar times series using recurrent neural networks (RNN). DeepAR outperforms standard autoregressive integrated moving average (ARIMA) and exponential smoothing (ETS) by training a single model over multiple time series as opposed to each individual time series
+
+Can predict both point-in-time values and estimated values over a timeframe by using multiple sets of historic data
+
+Cold Start Problem
+  * Trying to predict the future results of something we don't have historical data for, like sales for a brand new product.
+  * Can use DeepAR to predict the results for e.g. a new product line by combining the historic sales data of multiple other products
+
+|Forecast Type|Example|
+|---|---|
+|Point Forecast|"Number of sneakers sold in a week is X"|
+|Probabilistic Forecast|"Number of sneakers sold in a week is between X and Y with Z% probability."|
+
+Support for various time series
+  * Time series can be numbers, counts, or values in an interval (such as temperature readings between 0 and 100.)
+
+More time series is better
+  * Recommend training a model on as many time series as are available. DeepAR really shines with hundreds of related time series
+
+Must supply at least 300 observations
+  * DeepAR requires a minimum number of observations across all time series
+
+You must supply some hyperparameters
+  * Context Length (number of time points the model gets to see before making a predition), Epochs (number of passes over the training data), Prediction Length (the number of time steps that the model is trained to predict, the forecast horizon) and Time Frequency (the granularity of the time series data we are passing in: months, weeks, days, hours, etc.) are required hyperparameters
+
+Automatic Evaluation of the Model
+  * Uses a backtest after training to evaluate the accuracy of the model automatically
+
+Use Cases:
+  * Forecasting new product performance
+    * Example: Incorporate historical data from other products to create a model that can predict performance of a newly released product.
+  * Predict labor needs for special events
+    * Example: Use labor utilization rates at other distribution centers to predict the required level of staffing for a brand new distribution center
+
+## Ensemble Learning
+
+Ensemble Learning - using multiple learning algorithms and models collectively to hopefully improve the model accuracy.
+
+### XGBoost
+
+Supervised
+
+Open-source implementation of the gradient boosted trees algorithm that attempts to accurately predict a target variable by combining the estimates of a set of simpler, weaker models
+
+A virtual "Swiss army knife" for all sorts of regression, classification and ranking problems, with 2 required and 35 optional hyperparameters to tune.
+
+Accepts CSV and libsvm for training and inference
+  * Uses tabular data with rows representing observations, one column representing the target variable or label and the remaining columns representing features
+
+Only trains on CPU and memory bound
+  * Currently only trains on CPU instances and is memory-bound as opposed to compute-bound
+
+Recommend lots of memory
+  * AWS recommends using an instance with enough memory to hold the entire training data for optimal performance
+
+Spark Integration
+  * Using the SageMaker Spark SDK, you can call XGBoost direct from within the Spark environment
+
+Decision Tree Ensembles Usage Example:
+  * Determine the right price to sell a house at
+  * Has many potentially relevant variables
+  * Can create a decision tree for each independent variable (CART, Classification and Regression Trees)
+  * Each tree will apply a modifier to the price
+  * Using multiple trees to create a more realistic estimation model than any one tree could have provided
+
+Use Cases:
+  * Ranking
+    * Example: On an e-commerce website, you can leverage data about search results, clicks, and successful purchases, and then use XGBoost to train a model that can return relevance scores for searched products
+  * Fraud Detection
+    * Example: When XGBoost is given a dataset of past transactions and whether or not they were fraudulent, it can learn a function that maps input transaction data to the probability that transaction was fraudulent
+
+## Exam Tips
+
+Concepts:
+  * Difference between an algorithm and a heuristic
+  * Be aware of how bias can foul our models
+  * Understand the difference between a discrete model and a continuous model
+  * Understand the difference and characteristics of supervised learning, unsupervised learning and reinforcement learning
+  * Know the options SageMaker provides for algorithms (built-in, buy and bring-our-own)
+
+Regression
+  * Understand the types of problems best suited for Regression
+  * Linear Learner algorithm seeks to minimize error via Stochastic Gradient Descent (SGD) with regression problems
+  * Linear Learner can also be used with classification problems too
+  * Know that Factorization Machines are best suited for sparse datasets and don't perform well on dense data at all
+
+Clustering
+  * Know that clustering algorithms are usually unsupervised
+  * Understand that K-Means can perform clustering similar items based on identifying attributes
+  * We must define the identifying attributes, number of features and number of clusters
+
+Classification
+  * Understand the difference between Classification and Clustering
+  * K-NN can be used for classification or regression problems based on the nearest K data points
+  * K-NN considered *lazy* algorithm because it does not seek to generalize... rather looks for who's nearest
+
+Image Analysis
+  * Know that image analysis services are usually classifier models which require training
+  * Understand the difference between the SageMaker algorithms of Image Classification, Object Detection and Semantic Segmentation
+  * Be familiar with the higher-level Amazon Rekognition service
+
+Anomaly Detection
+  * Understand that Random Cut Forest is best suited to detect unusual and out-of-the-ordinary events
+  * Know that IP Insights is used to detect anomalies between IPv4 addresses and various entities such as user IDs or account numbers
+
+Text Analysis
+  * Latent Dirichlet Allocation (LDA) most commonly used to figure out similarity of documents but that it also has uses in other clustering problems
+  * Know that a Neural Topic Model (NTM) and LDA can both perform topic modeling but use different algorithms
+  * Sequence to Sequence (seq2seq) is often used in language translation and speech to text by using an embedding, encoding and decoding process
+  * Understand BlazingText is highly optimized and can be used to cluster as well as classify text
+
+Reinforcement Learning
+  * Know that RL seeks to find the policy that optimizes an agent acting in an environment
+  * Understand the components of the Markov Decision Process (MDP)
+  * RL is best suited for situations where the agent can or must make autonomous decisions
+
+Forecasting
+  * Know why DeepAR is considered to outperform other regression methods of forecasting
+  * Understand the Cold Start Problem and how DeepAR can help
+  * Understand the difference between Point Forecasts and Probabilistic forecasts
+
+Ensemble Learning
+  * Understand Ensemble Learning from a conceptual standpoint
+  * XGBoost can be used for regression, classification and ranking problems
+  * Know how XGBoost uses decision trees to create an improvement over linear regression
+  * XGBoost is "memory-bound" vs "compute-bound"
