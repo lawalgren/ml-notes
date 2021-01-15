@@ -1798,3 +1798,207 @@ Ensemble Learning
   * XGBoost can be used for regression, classification and ranking problems
   * Know how XGBoost uses decision trees to create an improvement over linear regression
   * XGBoost is "memory-bound" vs "compute-bound"
+
+# Evaluation and Optimization
+
+## Concepts
+
+Remember: We want __generalization__ not __memorization__.
+
+Evaluation Steps:
+  * Define Evaluation
+    * Determine what metric or metrics we should use to decide if the algorithm is "good enough"
+  * Evaluate
+    * Review the metrics during or after the training process. This might be manual or automatic, depending on algorithm
+  * Tune
+    * Adjust hyperparameters, data, the evaluation strategy or even the entire algorithm to bring us closer to the desired results
+  * Repeat
+
+Types of Validation:
+  * Offline Validation
+    * Validation done using sets of data
+    * Example: Validation Sets and K-Fold Validation
+  * Online Validation
+    * Validation under real-world conditions
+    * Example: Canary deployments or A/B Testing
+
+Canary Deployment
+  * Redirect a fraction of traffic to new model, determine whether new version is better than the existing one
+
+## Monitoring and Analyzing Training Jobs
+
+Algorithms have two categories of Metrics:
+  * Training Metrics - Used during the training process to ensure the training is going all right 
+    * Have a 'test' prefix
+  * Validation Metrics - Used when testing the model
+    * Have a 'validation' prefix
+  * AWS Documentation describes these as well as Optimization Direction, whether we want this metric to be maximized or minimized
+
+SageMaker sends algorithm metrics and logs are sent to CloudWatch, where they can be viewed and visualized
+  * SageMaker can also send metrics for custom algorithms to CloudWatch, just have to define the metrics when creating the training job
+
+## Evaluation Model Accuracy
+
+Want to avoid Underfitting and Overfitting
+
+### Underfitting 
+
+Our model just isn't very reflective of the underlying data shape. Maybe we need some more variables to help train our model and achieve a better fit
+
+Methods to prevent Underfitting:
+  * More Data - sometimes more data will provide enough additional entropy to steer your algorithm away from underfitting
+  * Train longer - The algorithm neds more iterations with the data to minimize error
+
+### Overfitting 
+
+Our model is too dependent on that specific data that we used to train. If it sees any new data, accuracy will likely be poor unless the data is identical to the training data. We have trained our model to __memorize__ rather than __generalize__.
+
+What we want is a robust model:
+  * Our model fits the training data but also does reasonably well on new data which it has never seen.
+  * It can "deal" with noise in the data.
+  * It can __generalize__ effectively for that new data
+
+|Training Error|Testing Error||
+|---|---|---|
+|Low|Low|You want this!|
+|Low|High|Overfitting|
+|High|High|Try another approach|
+|High|Low|Run Away!|
+
+Methods to prevent overfitting:
+  * More Data - sometimes more data will provide enough additional entropy to steer your algorithm away from overfitting
+  * Early Stopping - Terminate the training process before it has a chance to "overtrain". Many algorithms include this option as a hyperparameter
+  * Sprinkle in some noise - You training data could be TOO clean and you might need to introduce some noise to generalize the model
+  * Regulate! - Regularization forces your model to be more general by creating constraints around weights or smoothing the input data
+  * Ensembles - Combine different models together to either amplify individual weaker models (boosting) or smooth out strong models (bagging)
+  * Ditch some features - (aka Feature Selection) Too many irrelevant features can influence the model in a negative way by drowning out the signal noise
+
+### Regression Accuracy
+
+* If Predicted = 45, Actual = 42, Difference (Residual) = (-3)
+
+* Negative residual means predicted value is higher
+
+* Can graph occurrances of residuals on a histogram to get a residual distribution
+  * Want the curve centered around 0, meaning it predicts higher or lower in roughly equal quantities
+  * if the curve is centered around a negative number, it's consistently predicting too high
+  * centered around a positive number - consistently predicting too low
+  * In either the positive or negative center, probably have some systemic flaw in the model
+
+Root Mean Square Error (RMSE)
+  * RMSE = <img src="https://render.githubusercontent.com/render/math?math=\large \sqrt{\frac{1}{n}\sum_{i=1}^n (actual_{i} - predicted_{i})^2}">
+  * A measure of the distance between an actual observation and predicted value
+  * Lower RMSE is better
+
+### Binary Classification Accuracy
+
+||TRUE|FALSE|
+|---|---|---|
+|TRUE|I predicted correctly!|I was wrong. (False Positive) <br> TYPE 1 ERROR|
+|FALSE|I was wrong. (False Negative)<br>TYPE II Error|I predicted correctly!|
+
+Area Under the Curve (AUC) is an industry standard for evaluating binary classification models
+
+Recall = <img src="https://render.githubusercontent.com/render/math?math=\Large \frac{We\:Guessed\:Right}{We\:Guessed\:Right %2B We\:Should\:Have\:Flagged\:These\:Too}">
+  * Example Consequence - Spam Gets Through
+  * If asked to recall what happened, probably won't have all details, will leave some stuff out
+
+Precision = <img src="https://render.githubusercontent.com/render/math?math=\Large \frac{We\:Guessed\:Right}{We\:Guessed\:Right %2B We\:Flagged\:These\:but\:We\:Were\:Wrong}">
+  * Example Consequence - Legitimate Emails Get Blocked
+  * Important that we get 100% of the spam, so have to be very precise
+
+As recall goes up, precision decreases
+
+F1 Score = <img src="https://render.githubusercontent.com/render/math?math=\Large \frac{2\:*\:(Precision\:*\:Recall)}{(Precision\:%2B\:Recall)}">
+  * The balance between Precision and Recall
+  * A larger value indicates better predictive accuracy
+  * If you want to reduce false positives or false negatives specifically, probably won't optimize for the F1 score
+
+For a multiclass classification problem, can calculate the F1 score for each class and average them to get the Macro Average F1 Score, which represents the overall accuracy of the model.
+
+Improving Model Accuracy
+  * Collect Data
+    * Increase the number of training examples available to the model. More (good) data usually means a more accurate model.
+  * Feature Processing
+    * Provide additional quality variables or refine the existing variables so they are more representative
+  * Model Parameter Tuning
+    * Adjust the hyperparameters used by your training algorithm
+
+__BEWARE OF BIAS AND OVER-FITTING__
+
+## Model Tuning
+
+Model Tuning - Making small adjustments to hyperparameters to improve the performance of the model
+
+Automatic Model Tuning - Also known as hyperparameter tuning, finds the best version of a model by running many jobs that test a range of hyperparameters on your dataset
+  * Choose a tunable hyperparameter 
+    * Decide which hyperparameter you want to adjust. Not all hyperparameters can be auto-tuned
+  * Choose a range of value
+    * Specify the range of values to use for tuning the hyperparameter, paying attention to the allowable max/min
+  * Choose the objective metric
+    * Specify the objective metric that the auto-tuning job will seek to optimize
+
+Optimization Metrics:
+  * Training Metrics - Used during the training process to ensure the training is going all right 
+    * Have a 'test' prefix
+  * Validation Metrics - Used when testing the model
+    * Have a 'validation' prefix
+  * AWS recommends different metrics to use based on the algorithm
+    * e.g. Use Validation Metrics as the objective metric to avoid overfitting for the Linear Learner
+  * Recommended metric may differ based on how we're using the algorithm
+    * e.g. For BlazingText
+      * train:mean_rho for Word2Vec
+      * validation:accuracy for Text Classification
+  * Tunable hyperparameters also differ based on the mode of the algorithm being used
+
+Bayesian Reasoning
+  * If the value we were looking for was 99%, we could get there in a few ways
+    * Matrix - trying ascending values until one works
+    * Random - trying random values until one works
+    * Both are inefficient
+    * Bayesian reasoning takes into account what has happened in the past to build a probability model for what we should choose as the next value
+
+Example:
+
+Hyperparater to Tune - learning_rate
+
+Range - 0.00001 to 1
+
+Optimization Metric - validation:objective_loss (minimize)
+
+|learning_rate|objective_loss|
+|---|---|
+|0.00001|1.0|
+|0.00010|0.4|
+|0.00100|0.1|
+...
+
+Tries to avoid costly iterations by focusing on what hyperparameter value is likely to give more improvement
+
+## Exam Tips
+
+Concepts
+  * Remember we want to Generalize...not Memorize
+  * Understand the difference between Offline Validation and Online Validation
+  * Know conceptually about a Canary deployment
+
+Monitoring and Analyzing Training Jobs
+  * Know the difference between Training metrics and Validation metrics
+  * Know that CloudWatch integrates well with SageMaker for both logging and metric charting and dashboarding
+  * Understand how to define custom metrics for custom algorithms
+
+Evaluating Model Accuracy
+  * Understand underfitting and overfitting as well as potential causes and countermeasures
+  * Know that regression accuracy is measured by RMSE
+  * Be able to explain what it means if a histogram of residuals is skewed negatively or positively
+  * For binary classification, know what AUC metric indicates
+  * Understand trade-offs and how different scenarios might call for different optimizations
+  * Understand how to read a confusion matrix and know what an F1 Score and Macro Average F1 Score metric can tell you
+  * Know some ways to improve model accuracy
+
+Model Tuning
+  * Recall hyperparameters and how they can be adjusted to control your learning process
+  * Know the three components you must define for automatic tuning
+  * Understand that the best metrics to optimize varies by algorithm and sometimes is specific to how you use the algorithm (BlazingText for example)
+  * Conceptually understand Bayesian Optimization
+  * Automatic Tuning is not the perfect solution and sometimes may result in weaker models
