@@ -9,7 +9,7 @@ Recommended
 
 Exam:
   * 180 minutes, ~65 questions
-  * Multiple choirce and multiple-resonse
+  * Multiple choice and multiple-resonse
   * No partial credit
   * No points for unanswered questions
   * Scores between 100 and 1000 with min passing score 750
@@ -25,7 +25,7 @@ AWS will try to trick you to expose gaps in your knowledge.
 
 ## About Course
 
-* Deep knowledge of Sagemaker, Glue, and Kinesis
+* Deep knowledge of SageMaker, Glue, and Kinesis
 
 * Focus on service capabilities and what problems they solve, don't memorize service limits, prices, version numbers.
 
@@ -62,8 +62,8 @@ Before you begin, ask a few questions:
 |Traits of Good Data                   | Traits of bad data                                          | Why|
 |--------------------------------------|-------------------------------------------------------------|----|
 |Large datasets                        | Small datasets (less than 100 rows).                        | Generally, more data means better model training|
-|Precise attribute types, feature rich | Useless attributes, not needed for solving problem at hand. | Models need to train on importan features|
-|Complete fields, no missing values    | Missing values, null fields.                                | Modes can skewresults when data points are missing.|
+|Precise attribute types, feature rich | Useless attributes, not needed for solving problem at hand. | Models need to train on important features|
+|Complete fields, no missing values    | Missing values, null fields.                                | Modes can skew results when data points are missing.|
 |Values are consistent.                | Inconsistent values                                         | Models like clean and consistent data|
 |Solid distribution of outcomes        | Lots of positive outcome, few negative outcomes             | Models cannot learn with skewed distribution of outcomes|
 |Fair sampling                         | Biased sampling                                             | Models will skew results with biased data|
@@ -270,7 +270,7 @@ Shard Components
 
 Shard Notes:
   * Each shard consists of a sequence of data records. These can be ingested at 1000 records per second
-  * Default limit of 500 shards, but you can request to unlimited shards.
+  * Default limit of 500 shards, but you can request unlimited shards.
   * A data record is the unit of data captured
     * sequence number
     * partition key
@@ -284,7 +284,7 @@ Interacting with Kinesis Data Streams
 
 Kinesis Producer Library (KPL)
   * Provides a layer of abstraction specifically for ingesting data
-  * Automatic and conrfigurable retry mechanism
+  * Automatic and configurable retry mechanism
   * Additional processing delay can occur for higher packing efficiencies and better performance
   * Java wrapper
 
@@ -360,7 +360,7 @@ Use Cases
 |----------------------------------------------------------------------------------------------------|-------------------------------|-----|
 |Need to stream Apache log files directly from (100) EC2 instances and store them into Redshift      | Kinesis Firehose              | Firehose is for easily streaming data directly to a final destination. First the data is loaded into S3, then copied into Redshift|
 |Need to stream live video coverage of a sporting event to distribute to customers in near real-time | Kinesis Video Streams         | Kinesis Video Streams processes real-time streaming video data (audio, images, radar) and can be fed into other AWS services.|
-|Need to transform real-time streaming data and immediately feed into a custom ML application        | Kinesis (Data) Streams        | Kinesis Streams allows for streaming hug amounts of data, process/transform it, and then store it or feed into custom applications or other AWS services.|
+|Need to transform real-time streaming data and immediately feed into a custom ML application        | Kinesis (Data) Streams        | Kinesis Streams allows for streaming hug amounts of data, processing/transforming it, and then storing it or feeding into custom applications or other AWS services.|
 |Need to query real-time data, create metric graphs, and store output into S3                        | Kinesis Analytics             | Kinesis Analytics gives you the ability to run SQL queries on streaming data, then store or feed the output into other AWS services|
 
 ## Exam Tips
@@ -526,6 +526,7 @@ Raw Text: {"he is a jedi and he will save us"} -> OSB, size = 4 ->
   {"and_he", "and__will", "and___save"}
   {"he_will", "he__save", "he___us"}
   {"will_save", "will__us"}
+  {"save_us"}
 ```
 
 Always keeps the first word, then uses underscores where the other words in the token are
@@ -623,7 +624,7 @@ Returns:
 |---|---|
 |1|{"Python_Softcover", "Data_Softcover", "Science_Softcover", "Handbook_Softcover"}|
 |2|{"Visualization_Hardcover", "Analysis_Hardcover", "Design_Hardcover"}|
-|3|{"Machine_Softcover", "Learning_Softcover", "Algorithms_Softcover"|
+|3|{"Machine_Softcover", "Learning_Softcover", "Algorithms_Softcover"}|
 
 ### Feature Engineering Dates
 
@@ -854,7 +855,7 @@ SageMaker
 
 Elastic Map Reduce (EMR)
   * Entire data preparation ETL could be done on the EMR ecosystem.
-  * A fully managed hadoor cluster that runs on multiple EC2 instances
+  * A fully managed Hadoop cluster that runs on multiple EC2 instances
   * Can pick and choose different frameworks that you want to use within the cluster
   * Great at scaling petabytes worth of data over distributed systems
   * Notable Tools
@@ -904,7 +905,7 @@ Categorical Encoding
 Numeric Feature Engineering
   * Know what numeric feature engineering is and why it is important
   * Know different techniques used for feature engineering numeric data
-  * Know the different types of feature scalin and when they should be used
+  * Know the different types of feature scaling and when they should be used
     * Normalization
     * Standardization
   * Know what binning is and when it should be used
@@ -937,7 +938,7 @@ Feature Selection
 Data Preparation Tools
   * Know the different AWS services that allow you to transform data
   * Know what a Data Catalog, Crawlers, and Jobs are in AWS Glue
-  * Be able to identify the different AWS servics and when to use one transformation over another
+  * Be able to identify the different AWS services and when to use one transformation over another
 
 # Data Analysis and Visualization
 
@@ -990,7 +991,7 @@ Use Cases
 
 ## Distributions
 
-Visualizing distributions in your data can show how your data is grouped or clustered over certain intervals.o
+Visualizing distributions in your data can show how your data is grouped or clustered over certain intervals.
 
 Histograms - put values into buckets or bins and determine a measurement (amount, frequency, duration, density, etc.)
 
@@ -1454,7 +1455,7 @@ Amazon Rekognition does this for us
 
 Algorithms:
   * Image Classification - Supervised
-    * Determine the classification of an image. It uses a convolutional neural network (ResNet) that can be trained from scrath or make use of transfer learning.
+    * Determine the classification of an image. It uses a convolutional neural network (ResNet) that can be trained from scratch or make use of transfer learning.
     * Think: Hotdog / Not Hotdog
     * Good resource is ImageNet, a huge database of labeled images
   * Object Detection - Supervised
@@ -1574,7 +1575,7 @@ Use Cases:
 
 Supervised & Unsupervised
 
-Highly optimized iomplementations of the Word2vec and text classification algorithms. The Word2vec algorithm is useful for many downstream natural language processing (NLP) tasks, such as sentiment analysis, machine translation, etc.
+Highly optimized implementations of the Word2vec and text classification algorithms. The Word2vec algorithm is useful for many downstream natural language processing (NLP) tasks, such as sentiment analysis, machine translation, etc.
 
 Really, really optimized way to determine contextual semantic relationships between words in a body of text
 
@@ -1933,7 +1934,7 @@ Model Tuning - Making small adjustments to hyperparameters to improve the perfor
 Automatic Model Tuning - Also known as hyperparameter tuning, finds the best version of a model by running many jobs that test a range of hyperparameters on your dataset
   * Choose a tunable hyperparameter 
     * Decide which hyperparameter you want to adjust. Not all hyperparameters can be auto-tuned
-  * Choose a range of value
+  * Choose a range of values
     * Specify the range of values to use for tuning the hyperparameter, paying attention to the allowable max/min
   * Choose the objective metric
     * Specify the objective metric that the auto-tuning job will seek to optimize
@@ -2002,3 +2003,305 @@ Model Tuning
   * Understand that the best metrics to optimize varies by algorithm and sometimes is specific to how you use the algorithm (BlazingText for example)
   * Conceptually understand Bayesian Optimization
   * Automatic Tuning is not the perfect solution and sometimes may result in weaker models
+
+# Implementation and Operations
+
+## Concepts
+
+Two Types of Usage
+
+||Offline Usage|Online Usage|
+|---|---|---|
+|What|Make inferences on datasets in batch and return results as a set.|Make inferences on demand as the model is called and return results immediately|
+|Why|Entire dataset is needed for inferences;<br>Pre-process data before using as an input for another model|Need instance response when endpoint is called via an app or service|
+|When|- Predictive models with large historic dataset inputs<br>- Feature engineering for a follow-on model|- Real-time fraud detection<br>- Autonomous machines|
+
+Types of Deployments
+
+||"Big Bang" - A full cutover from the old to the new|Phased Rollout - Gradually deploy the new system and decomission the old system|Parallel Adoption - running both systems simultaneously|
+|---|---|---|---|
+|Time|Low|Medium|High|
+|Risk|High|Low|Low \*|
+|Cost|function(Risk, Time)|function(Risk, Time)|function(Risk, Time)|
+
+\* Sometimes risk is amplified in a Parallel Adoption due to concurrency such as data synchronization issues, multiple processes, temporary integrations, etc.
+
+Phased Rollout is the most common way to approach ML deployments
+
+Rolling Deployment - Rather than upgrade all resources at once, the upgrade is done one by one to minimize downtime
+
+Canary Deployment - Deploy a new version into production so it sees a small portion of the total traffic and evaluate the performance and behavior
+
+A/B Testing
+  * Deploy a new version into production and configure a set amount of new inbound traffic to use the new (B) version, recording follow-on data about the outcome of those who used the new version
+  * Once enough data is collected, make a decision on whether to fully deploy the new version or make adjustments.
+
+CI/CD
+  * Continuous Integration - Merge code changes back to main branch as frequently as possible with automated testing as you go.
+  * Continuous Delivery - You have automated your release process to the point you can deploy at the click of a button
+  * Continuous Deployment - Each code change that passes all stages of the release process is released to production with no human intervention required
+
+## AI Developer Services
+
+AI Services:
+  * For App Developers, no ML experience required
+  * Amazon Comprehend
+  * Amazon Lex
+  * Amazon Polly
+  * Amazon Rekognition
+  * Amazon Translate
+  * Amazon Transcribe
+  * Amazon Personalize
+
+ML Services:
+  * For ML Developers and Data Scientists
+  * Amazon SageMaker
+    * Ground Truth
+    * Notebooks
+    * Training
+    * Algorithms
+    * Marketplace
+
+ML Frameworks & Infrastructure
+  * For ML Researchers and Academics
+  * Frameworks
+    * MXNet
+    * TensorFlow
+  * Interfaces
+    * Gluon
+    * Keras
+  * Services
+    * Amazon Greengrass
+    * Amazon EC2
+    * AWS Deep Learning AMIs
+
+AI Developer Services:
+  * Easy to use with no ML knowledge required
+  * Scalable and Robust
+  * Redundant and Fault Tolerant
+  * Pay per Use
+  * REST API and SDK
+
+||Amazon Comprehend|Amazon Forecast|Amazon Lex|Amazon Personalize|
+|---|---|---|---|---|
+|What|Natural Language Processing (NLP) service that finds insight and relationships within text|Combines time-series data with other variables to deliver highly accurate forecasts|Build conversational interfaces that can understand the intent and context of natural speech.|Recommendation engine as a service based on demographic and behavioral data|
+|When|Sentiment analysis of social media posts|Forecast seasonal demand for a specific color of shirt|Create a customer service chatbot to automatically handle routing requests|Provide potential upsell products at checkout during a web transaction.|
+
+||Amazon Polly|Amazon Rekognition|Amazon Textract|Amazon Transcribe|Amazon Translate|
+|---|---|---|---|---|---|
+|What|Text-to-Speech service supporting multiple languages, accents and voices.|Image and video analysis to parse and recognize objects, people, activities and facial expressions.|Extract text, context and metadata from scanned documents|Speech-to-Text as a service|Translate text to and from many different languages.|
+|When|Provide dynamically generated personalized voice response for inbound callers|Provide an additional form of employee authentication through facial recognition as they scan an access badge.|Automatically digitize and process physical paper forms.|Automatically create transcripts of recorded presentations.|Dynamically create localized web content for users based on their geography.|
+
+## Amazon SageMaker Deployments
+
+Deployment Types:
+
+||Offline Usage|Online Usage|
+|---|---|---|
+|Usage|Asynchronous or Batch|Synchronous or Real-Time|
+|When|Generate predictions for a whole set of data at once|Generate low-latency predictions|
+|Method|SageMaker Batch Transform|SageMaker Hosting Services|
+|Input Format|Varies depending on Algorithm|Varies depending on Algorithm|
+|Output Format|Varies depending on Algorithm|JSON string|
+
+SageMaker Hosting Services Endpoint Creation Steps
+  * Create a model
+    * This is the inference engine that will provide predictions for your endpoint.
+    * Can specify model artifacts generated via the training process or use a model package from the AWS Marketplace
+    * Can retrain and create new versions of the model to better fit new data
+  * Create an Endpoint Configuration
+    * Defines the model to use, inference instance type, instance count, variant name and weight.
+    * Also called a Production Variant.
+    * Specify an instance type as well as Initial Weight
+    * Initial Weight
+      * Control the amount of traffic going to a particular production variant
+      * Percent of Traffic = <img src="https://render.githubusercontent.com/render/math?math=\Large \frac{Variant\:Weight}{Sum\:of\:All\:Weights}">
+  * Create an Endpoint
+    * Publishes the model via the endpoint configuration to be called by the SageMaker API InvokeEndpoint() method.
+
+Batch Transform
+  * CreateTransformJob to deploy model, data in S3 is sent to provisioned ML instances, logged in CloudWatch
+
+Inference Pipelines
+  * Problem: What is the estimated basket size of shoppers who respond to our email promotion
+  * Solution: Remove outliers (Random Cut Forest) -> Identify relevant attributes (PCA) -> Cluster into groups (K-Means) -> Predict basket size (Linear Learner)
+  * To make this happen in SageMaker can use Inference Pipelines
+  * Inference Pipelines
+    * A SageMaker model composed of a sequence of two to five containers which can process the data as a flow. These can be built-in algorithms or your own custom algorithms in Docker containers.
+  * Can be used for both Real-time Inference and Batch Transform
+  * All containers deployed to the same EC2 instance for local speed
+
+SageMaker Neo
+  * Enables a simplified way to optimize machine learning models for a variety of computing architectures such as ARM, Intel and nVidia processors
+  * Consists of a compiler to convert the machine learning model into an optimized binary and a runtime to execute the model on the target architecture
+
+Elastic Inference
+  * Speeds up throughput and decreases latency of real-time inferences deployed on SageMaker Hosted Services using only CPU-based instances but much more cost-effective than a full GPU instance
+  * Must be configured when you create a deployable model and EI is not available for all algorithms yet
+
+Automatic Scaling
+  * Dynamically add and remove instances to production variant based on changes in workload.
+  * You define and apply a scaling policy that uses a CloudWatch metric and target value such as *InvocationsPerInstance*
+  * We define min instances, max instances, target metric, and cooldown seconds
+  * Cool down periods provide our landscape with a chance to stabilize before adding or removing instances, a buffer to allow our newly provisioned instances to start taking on load before we add more instances
+
+High Availability with SageMaker
+  * AWS recommends we use multiple instances for mission critical endpoints, AWS will automatically distribute those instances over separate AZs, and spin up new instances when AZs go down to match the target instance count
+
+## Other ML Deployment Options
+
+Other deployment options:
+  * Amazon Elastic Container Service
+  * Amazon EC2
+  * Amazon Elastic Map Reduce
+  * On-Premises
+
+The process for deploying on some other option is largely similar to deploying in SageMaker, train the model in SageMaker, take the model artifacts on S3, then 
+  * For Elastic conainer service, deploy the proper inference image ourselves using the model artifacts
+    * Can either manually deploy on an EC2 instance / fleet of instances, or use AWS Fargate to automatically provision instances for our ML containers
+  * Deploying with EC2 - select one of the Deep Learning AMIs from the AMI catalog and use that, then select the instance type appropriate for the algorithm in use
+    * Manage like any other EC2 instance, can even create an API Gateway frontend to serve a REST API for our interface model
+  * Deploying with EMR (Spark) - Can deploy to an EMR cluster manually using Spark, or can use the SageMaker Spark SDK to make use of an existing Hadoop landscape to preprocess and source data from an existing Hadoop data warehouse, either on-prem or in EMR
+    * Use existing Spark pipelines for pre-processing data
+    * Potentially more cost-efficient for non-GPU workloads
+    * Leverage existing Hadoop landscape and resources
+  * Deploying Locally
+    * Download the model artifacts from 'model.tar.gz' and load up in on-prem tensorflow/mxnet
+
+## Security
+
+House Analogy:
+  * Visiblity
+    * Will I allow you into my driveway?
+    * Am I going to open my outer gate?
+    * AWS Equivalent
+      * VPC Endpoints
+      * Network Access Control Lists
+      * Security Groups
+  * Authentication
+    * Will I let you in through the front door of my house?
+    * AWS Equivalent
+      * Identity and Access Management
+  * Access Control
+    * What rooms will I let you access once inside of my house?
+    * AWS Equivalent
+      * Identity and Access Management
+  * Encryption
+    * Will I give you the secret decoder ring to allow you to read the books in the rooms?
+    * AWS Equivalent
+      * Key Management Service
+
+Typical Security Architecture for Secure Instances
+  * Security Groups in the innermost layer, little "firewalls" around our instances
+  * Then, Network Access Control Lists, govern which traffic we allow in and out of our subnets
+  * Internet Gateway or NAT - provides access to the internet
+  * VPC Endpoint
+    * A way to access other AWS services using the AWS network without having to send traffic over the public internet.
+    * VPC Endpoints increase security and allow AWS services to communicate privately and reliably
+    * There are two types of VPC Endpoints: Interface Endpoints and Gateway Endpoints. Gateway Endpoints are only available for S3 and DynamoDB and differ because they use a route table entry versus a private DNS entry that the Interface Endpoints use. In the end, they both fulfill the same function.
+    * You might also hear PrivateLink when referring to endpoints, this is the AWS service that powers Interface Endpoints.
+  * For a SageMaker notebook instance in a VPC, can use VPC Endpoints to grant access to S3 and the SageMaker API without going through the public internet
+  * In the CreateModel call, can specify which subnets and security groups for the SageMaker training job to use. SageMaker would create an Elastic Network Interface (EIP) linking the subnets to the training containers
+
+Security Implications for Notebook Instances
+  * Internet-enabled by Default
+    * By default, SageMaker notebook instances are internet-enabled. This allows for download and access to popular packages and libraries
+  * Can Disable Internet Access
+    * Internet access may represent a security concern to some, so you can disable direct internet access. However, for training and hosting models, you will need a NAT gateway, routes and security groups that permit Internet access.
+  * Designed for Single User
+    * Notebook instances provide the user with root access for installing packages. Best practice is one user per notebook instance. We can restrict access to users or roles via IAM policy.
+
+IAM Policies:
+
+||Identity-based Policy|Resource-based Policy|
+|---|---|---|
+|What|A permissions policy attached to IAM identities|A permissions policy attached to a resource|
+|Why|Allow or deny access to a role or user|Allow or deny access at the resource|
+|When|Only allow user "mary" to access the notebook instance "Mary_Notebook".|Restrict R/W access to an S3 bucket by specific AWS accounts.|
+
+Encryption
+
+||What|Generic Example|AWS Example|
+|---|---|---|---|
+|Encryption At Rest|Store data in an encrypted format|Use GPG to encrypt a file|Configure S3 bucket to use S3-KMS encryption.|
+|Encryption In Transit|Encrypt the data stream carrying the data|Using TLS to encrypt an HTTP connection (HTTPS)|Use Certificate Manager with CloudFront to provide TLS support for a custom domain.|
+
+SageMaker Encryption:
+  * Can encrypt Notbook Instances, Training Job data, Endpoints, and Batch Transform jobs. (Encryption At Rest)
+  * In the standard deployment, everything already uses HTTPS (Encryption In Transit)
+
+## Monitor and Evaluate
+
+### Amazon CloudWatch with SageMaker
+
+Wide Variety of Metrics
+  * Endpoint Invocation, Endpoint Instance, Transform and Ground Truth metrics available in addition to algorithm-specific metrics
+
+Near Real-Time
+  * Most SageMaker-specific metrics are available at a 1-minute frequency for quick reactions
+
+Metrics Available for 15 Months
+  * Statistics are kept 15 months to provide plenty of historical information on model performance and trends
+
+2 Week Limit on Console
+  * Metrics are collected and sent every five minutes for training and prediction jobs
+  
+Any stdout or stderr messages from notebook instances, algorithm containers, or model containers is sent to Amazon CloudWatch Logs
+
+|Log Group Name|Log Stream Name|
+|---|---|
+|/aws/sagemaker/TrainingJobs|\[training-job-name\]/algo-\[instance-number-in-cluster\]-\[epoch_timestamp\]|
+|/aws/sagemaker/Endpoints/\[EndpointName\]|\[production-variant-name\]/\[instance-id\]|
+|/aws/sagemaker/NotebookInstances|\[notebook-instance-name\]/\[LifecycleConfigHook\]|
+|/aws/sagemaker/TransformJob|\[transform-job-name\]/\[instance-id\]-\[epoch_timestamp\]<br>\[transform-job-name\]/\[instance-id\]-\[epoch_timestamp\]/data-log|
+
+Over time, our model might become less and less accurate. Can set up some CloudWatch alarm that monitors some accuracy metric and once it falls below a threshold, trigger a lambda function to create another training job using the new ground truth data to generate an improved model, then test the model and if it is better, roll it out.
+
+### Amazon CloudTrail with SageMaker
+
+Log API Access
+  * Captures any API calls made by or on behalf of SageMaker within your account
+
+Last 90 days' Events
+  * By default, the last 90 days of events are available in CloudTrail Event History
+
+Can Be Kept Indefinitely
+  * You can set up a CloudTrail to store logs on S3 to reference for as long as you'd like, as well as practice lifecycle processes like archive to Glacier
+
+Query with Amazon Athena
+  * For advances queries, you can use Amazon Athena to query and analyze data directly from S3
+
+## Exam Tips
+
+Concepts
+  * Understand the difference between online and offline usage for models and when you might use each
+  * Have a high-level understanding of the types of deployments and respective pros and cons
+  * Understand A/B testing and how it might be used to introduce a newly updated model
+  * Understand the concepts behind continuous integration, continuous delivery and continuous deployment
+
+AI Developer Services
+  * The AI developer services provided by AWS are scalable, fault-tolerant and ready to use
+  * Know each service, its purpose and in what use-cases they might be used
+  * Experiment with each service via the Console or CLI to get a feel for what it does and how it works
+
+Amazon SageMaker Deployments
+  * Know the three main steps in creating a deployment using SageMaker Hosting Services
+  * Understand ProductionVariants and how they can be used to introduce new evolutions of your models
+  * Know how to calculate the percentage of traffic given weights for each production variant
+  * Understand the purpose and limitations of Interface Pipeplines, SageMaker Neo, Elastic Inference, Auto-Scaling and Cool Down
+  * Recall best practice suggestions for high availability with SageMaker
+
+Other ML Deployment Options
+  * Know the four other options for ML deployment aside from SageMaker Hosting Services and when you might choose them instead of SageMaker
+
+Security
+  * Be familiar with using VPCs, NACLs, SGs, IAM and KMS to secure Amazon ML and SageMaker resources
+  * Understand a VPC Endpoint and why it increases security
+  * Know the Notebook Instances are Internet-enabled by default but this can be disabled given certain conditions and introducing limitations
+
+Monitor and Evaluate
+  * Understand the difference between CloudWatch and CloudTrail
+  * Know that CloudWatch has a limited storage while CloudTrail can have unlimited storage if you log to an S3 bucket.
+  * Understand how you might use metrics to trigger events like re-training
+
+
